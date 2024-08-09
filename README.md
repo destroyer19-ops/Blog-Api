@@ -1,178 +1,201 @@
+# Blogging Platform API
 
-# Personal Blogging Platform API
+## Overview
 
-This is a RESTful API for a personal blogging platform. The API supports CRUD operations for articles, including listing articles, retrieving a single article by ID, creating, updating, and deleting articles.
+The Blogging Platform API allows you to manage articles on a blogging platform. You can perform CRUD operations on articles, including retrieving all articles, getting a specific article by ID, creating, updating, and deleting articles.
 
 ## Table of Contents
 
-- [Installation](#installation)
-- [Usage](#usage)
+- [Getting Started](#getting-started)
 - [API Endpoints](#api-endpoints)
+  - [Get All Articles](#get-all-articles)
+  - [Create Article](#create-article)
+  - [Get Article by ID](#get-article-by-id)
+  - [Update Article by ID](#update-article-by-id)
+  - [Delete Article by ID](#delete-article-by-id)
 - [Swagger Documentation](#swagger-documentation)
-- [Contributing](#contributing)
+- [Database Schema](#database-schema)
 - [License](#license)
 
-## Installation
+## Getting Started
 
-1. **Clone the repository:**
+### Prerequisites
 
-```sh
-git clone https://github.com/destroyer19-ops/BLOGGING_PLATFORM.git
-cd BLOGGING_PLATFORM
-```
+- Node.js (version 14 or higher)
+- PostgreSQL (version 13 or higher)
 
-2. **Install dependencies:**
+### Installation
 
-```sh
-npm install
-```
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/destroyer19-ops/Blog-Api.git
+   cd Blog-Api
+   ```
 
-3. **Set up PostgreSQL database:**
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-Create a PostgreSQL database and configure the connection in `db.js`:
+3. Set up your database configuration in a `.env` file:
+   ```env
+   DB_USER=postgres
+   DB_HOST=localhost
+   DB_PORT=5433
+   DB_NAME=blog
+   DB_PASSWORD=Portable-@19
+   PORT=3000
+   ```
 
-```javascript
-const { Pool } = require('pg');
+4. Run database migrations (if applicable).
 
-const pool = new Pool({
-    user: 'your_user',
-    host: 'localhost',
-    database: 'your_database',
-    password: 'your_password',
-    port: 5432,
-});
+5. Start the server:
+   ```bash
+   npm start
+   ```
 
-module.exports = pool;
-```
+## API Endpoints
 
-4. **Run the server:**
+### Get All Articles
 
-```sh
-npm start
-```
+- **URL**: `/api/v1/articles`
+- **Method**: `GET`
+- **Success Response**:
+  - **Code**: 200
+  - **Content**:
+    ```json
+    {
+      "data": [
+        {
+          "id": 1,
+          "title": "Sample Article",
+          "content": "This is a sample article.",
+          "author": "Author Name",
+          "tags": ["tag1", "tag2"]
+        }
+      ]
+    }
+    ```
 
-The server will be running at `http://localhost:3000`.
+### Create Article
 
-## Usage
-
-### API Endpoints
-
-- **GET /api/v1/articles**: Get all articles
-- **GET /api/v1/articles/:id**: Get article by ID
-- **POST /api/v1/articles**: Create a new article
-- **PUT /api/v1/articles/:id**: Update an article by ID
-- **DELETE /api/v1/articles/:id**: Delete an article by ID
-
-### Request/Response Examples
-
-#### Get all articles
-
-```sh
-GET /api/v1/articles
-```
-
-Response:
-
-```json
-[
+- **URL**: `/api/v1/articles`
+- **Method**: `POST`
+- **Request Body**:
+  ```json
   {
-    "id": 1,
-    "title": "First Article",
-    "content": "This is the content of the first article.",
-    "author": "Author 1",
-    "tags": "tag1, tag2",
-    "published_date": "2023-07-19T00:00:00.000Z"
-  },
-  ...
-]
+    "title": "New Article",
+    "content": "This is the content of the new article.",
+    "author": "Author Name",
+    "tags": ["tag1", "tag2"]
+  }
+  ```
+- **Success Response**:
+  - **Code**: 201
+  - **Content**:
+    ```json
+    {
+      "message": "Article Created",
+      "data": {
+        "id": 2,
+        "title": "New Article",
+        "content": "This is the content of the new article.",
+        "author": "Author Name",
+        "tags": ["tag1", "tag2"]
+      }
+    }
+    ```
+
+### Get Article by ID
+
+- **URL**: `/api/v1/articles/{id}`
+- **Method**: `GET`
+- **URL Params**:
+  - **id**: Integer (ID of the article)
+- **Success Response**:
+  - **Code**: 200
+  - **Content**:
+    ```json
+    {
+      "data": {
+        "id": 1,
+        "title": "Sample Article",
+        "content": "This is a sample article.",
+        "author": "Author Name",
+        "tags": ["tag1", "tag2"]
+      }
+    }
+    ```
+- **Error Response**:
+  - **Code**: 404
+  - **Content**:
+    ```json
+    {
+      "message": "Article not found!"
+    }
+    ```
+
+### Update Article by ID
+
+- **URL**: `/api/v1/articles/{id}`
+- **Method**: `PUT`
+- **URL Params**:
+  - **id**: Integer (ID of the article)
+- **Request Body**:
+  ```json
+  {
+    "title": "Updated Title",
+    "content": "Updated content",
+    "tags": ["tag1", "tag2"]
+  }
+  ```
+- **Success Response**:
+  - **Code**: 200
+  - **Content**: `"Article updated"`
+
+- **Error Response**:
+  - **Code**: 404
+  - **Content**:
+    ```json
+    {
+      "message": "Article not found"
+    }
+    ```
+
+### Delete Article by ID
+
+- **URL**: `/api/v1/articles/{id}`
+- **Method**: `DELETE`
+- **URL Params**:
+  - **id**: Integer (ID of the article)
+- **Success Response**:
+  - **Code**: 200
+  - **Content**: `"Article deleted"`
+
+- **Error Response**:
+  - **Code**: 404
+  - **Content**:
+    ```json
+    {
+      "message": "Article not Found"
+    }
+    ```
+
+## Swagger Documentation
+
+The API is documented using Swagger. You can view the interactive API documentation at:
+
+```
+http://localhost:3000/api-docs
 ```
 
-#### Get article by ID
+## Database Schema
 
-```sh
-GET /api/v1/articles/1
-```
+The database schema includes a single table, `articles`, with the following columns:
 
-Response:
+- `id`: Integer (Primary Key)
+- `title`: String
+- `content`: String
+- `author`: String
+- `tags`: Array of Strings
 
-```json
-{
-  "id": 1,
-  "title": "First Article",
-  "content": "This is the content of the first article.",
-  "author": "Author 1",
-  "tags": "tag1, tag2",
-  "published_date": "2023-07-19T00:00:00.000Z"
-}
-```
-
-#### Create a new article
-
-```sh
-POST /api/v1/articles
-Content-Type: application/json
-
-{
-  "title": "New Article",
-  "content": "This is the content of the new article.",
-  "author": "Author 2",
-  "tags": "tag3, tag4"
-}
-```
-
-Response:
-
-```json
-{
-  "message": "Article Created"
-}
-```
-
-#### Update an article by ID
-
-```sh
-PUT /api/v1/articles/1
-Content-Type: application/json
-
-{
-  "title": "Updated Title",
-  "content": "This is the updated content of the article.",
-  "tags": "tag1, tag3"
-}
-```
-
-Response:
-
-```json
-{
-  "message": "Article updated"
-}
-```
-
-#### Delete an article by ID
-
-```sh
-DELETE /api/v1/articles/1
-```
-
-Response:
-
-```json
-{
-  "message": "Article deleted"
-}
-```
-
-### Swagger Documentation
-
-Swagger documentation is available at `http://localhost:3000/api-docs`.
-
-## Contributing
-
-Contributions are welcome! Please fork this repository and submit a pull request for any changes.
-
-## License
-
-This project is licensed under the MIT License.
-
----
