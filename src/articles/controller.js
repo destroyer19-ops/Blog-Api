@@ -4,10 +4,10 @@ const queries = require('./queries');
 // Get all articles
 const getArticle = async (req, res) => {
     try {
-        pool.query(queries.getArticle, (error, results) => {
-            return res.status(200).json(results.rows)
-        })
+        const results = await pool.query(queries.getArticle)
+            return res.status(200).json({data: results.rows})
     } catch (error) {
+        console.error(error.message); // Better logging practice
         return res.status(500).send(error.message);
     }
 }
@@ -17,42 +17,64 @@ const getArticle = async (req, res) => {
 const getArticleById = async (req, res) => {
     try {
         const id = parseInt(req.params.id);
-        pool.query(queries.getArticleById, [id], (error, results) => {
+        const results = await pool.query(queries.getArticleById, [id])
             const noArticle = !results.rows.length;
             if (noArticle) {
-                return res.send('Article not found!');
+                return res.json({message : 'Article not found!'});
             }
-            pool.query(queries.getArticleById, [id], (error, results) => {
-                return res.status(200).send(results.rows)
-            })
-        })
+            return res.status(200).json({data: results.rows})
     } catch (error) {
-        return res.status(500).send(error.message)
+        console.error(error.message); // Better logging practice
+        return res.status(500).json({message: error.message})
     }
 }
 
 // POST Article 
 const createArticle = async (req, res) => {
     try {
-        const { title, content, author, tags } = req.body
-        if(!title || !content || !author || !tags) {
-            return res.status(400).send("Required fields are empty")
+        const { title, content, author, tags } = req.body;
+
+        // Check for required fields
+        if (!title || !content || !author || !tags) {
+            return res.status(400).json({ message: "Required fields are empty" });
         }
-        pool.query(queries.createArticle, [title, content, author, tags], (error, results) => {
-            return res.status(201).send("Article Created")
-        })
+
+        // Execute the query to create the article
+        const result = await pool.query(queries.createArticle, [title, content, author, tags]);
+
+        // Check if the article was created
+        if (result.rowCount === 0) {
+            return res.status(500).json({ message: "Article creation failed" });
+        }
+
+        // Return a success message and the newly created article's ID
+        return res.status(201).json({
+            message: "Article Created",
+            data: {
+                id: result.rows[0].id, // Adjust based on how your database returns the ID
+                title,
+                content,
+                author,
+                tags
+            }
+        });
     } catch (error) {
-        console.log(error.message);
-        return res.status(500).send(error.message)
+        console.error(error.message); // Better logging practice
+        return res.status(500).json({ message: error.message });
     }
-}
+};
 
 const updateArticle = async (req, res) => {
     try {
         const id = parseInt(req.params.id);
         const {title, content, tags} = req.body;
-        console.log(req.body);
-        pool.query(queries.getArticleById, [id], (error, results) =>{
+
+        // Check if the ID is valid
+        if (isNaN(id)) {
+            return res.status(400).json({message: "Invalid article ID"});
+        }
+
+        const results = await pool.query(queries.getArticleById, [id])
             const noArticle = !results.rows.length;
             if(noArticle){
                 return res.status(404).send("Article not found")
@@ -61,34 +83,29 @@ const updateArticle = async (req, res) => {
             const existingArticle = results.rows[0];
             const updatedTitle = title || existingArticle.title;
             const updatedContent = content || existingArticle.content;
-            const updatedTags = tags || existingArticle.tags;
+            const updatedTags = tags !== undefined ? tags : existingArticle.tags;
             
-            pool.query(queries.updateArticle, [updatedTitle, updatedContent, updatedTags, id], (error, results) => {
-                if (error) throw error
-                return res.status(200).send("Article updated")
-            })
-        })
+            await pool.query(queries.updateArticle, [updatedTitle, updatedContent, updatedTags, id]) 
+                return res.status(200).send("Article updated")        
     } catch (error) {
         console.log(error.message);
-        return res.status(500).send(error.message)
+        return res.status(500).json({message: error.message})
     }
 }
 
 const deleteArticle = async (req, res) => {
     try {
         const id  = parseInt(req.params.id);
-        pool.query(queries.getArticleById, [id], (error, results)=> {
+        const results = await pool.query(queries.getArticleById, [id])
             const noArticle = !results.rows.length;
             if(noArticle) {
                 return res.status(404).send("Article not Found")
             }
-            pool.query(queries.deleteArticle, [id], (error, results) => {
+            await pool.query(queries.deleteArticle, [id]) 
                 if(error) throw error
-                return res.status(200).send("Article deleted")
-            })
-        })
+                return res.status(200).send("Article deleted")        
     } catch (error) {
-        return res.status(500).send(error.message)
+        return res.status(500).json({message: error.message})
     }
 }
 module.exports = {

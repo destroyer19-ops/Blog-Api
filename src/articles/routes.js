@@ -13,20 +13,25 @@ const router = Router();
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                   title:
- *                     type: string
- *                   content:
- *                     type: string
- *                   author:
- *                     type: string
- *                   tags:
- *                     type: string
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                       title:
+ *                         type: string
+ *                       content:
+ *                         type: string
+ *                       author:
+ *                         type: string
+ *                       tags:
+ *                         type: array
+ *                         items:
+ *                           type: string
  */
 router.get('/', controller.getArticle);
 
@@ -49,10 +54,34 @@ router.get('/', controller.getArticle);
  *               author:
  *                 type: string
  *               tags:
- *                 type: string
+ *                 type: array
+ *                 items:
+ *                   type: string
  *     responses:
  *       201:
  *         description: Article created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     title:
+ *                       type: string
+ *                     content:
+ *                       type: string
+ *                     author:
+ *                       type: string
+ *                     tags:
+ *                       type: array
+ *                       items:
+ *                         type: string
  */
 router.post('/', controller.createArticle);
 
@@ -76,18 +105,30 @@ router.post('/', controller.createArticle);
  *             schema:
  *               type: object
  *               properties:
- *                 id:
- *                   type: integer
- *                 title:
- *                   type: string
- *                 content:
- *                   type: string
- *                 author:
- *                   type: string
- *                 tags:
- *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     title:
+ *                       type: string
+ *                     content:
+ *                       type: string
+ *                     author:
+ *                       type: string
+ *                     tags:
+ *                       type: array
+ *                       items:
+ *                         type: string
  *       404:
  *         description: Article not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  */
 router.get('/:id', controller.getArticleById);
 
@@ -114,15 +155,22 @@ router.get('/:id', controller.getArticleById);
  *                 type: string
  *               content:
  *                 type: string
- *               author:
- *                 type: string
  *               tags:
- *                 type: string
+ *                 type: array
+ *                 items:
+ *                   type: string
  *     responses:
  *       200:
  *         description: Article updated
  *       404:
  *         description: Article not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  */
 router.put('/:id', controller.updateArticle);
 
@@ -143,6 +191,13 @@ router.put('/:id', controller.updateArticle);
  *         description: Article deleted
  *       404:
  *         description: Article not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  */
 router.delete('/:id', controller.deleteArticle);
 
